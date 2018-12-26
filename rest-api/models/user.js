@@ -1,4 +1,9 @@
-const mongoose = require('../db-conf/mongo');
+var mongoose = require('mongoose');
+var dbConf = require('../db-conf/mongo');
+
+mongoose.connect(dbConf.dbUrl, { useNewUrlParser: true })
+    .then((val) => console.log("Connected to db : ", val))
+    .catch((val) => console.log("Failed to Connect to db : ", val));
 
 
 var validateEmail = function(email) {

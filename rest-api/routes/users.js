@@ -3,7 +3,7 @@ var router = express.Router();
 var userModel = require('../models/user');
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
+router.get('/', async function(req, res, next) {
   userModel.find({}, function(err, result) {
     if(err) {
       res.status(500).json({message : err});
@@ -12,6 +12,7 @@ router.get('/', function(req, res, next) {
       res.status(200).json(result);
     }
   });
+  
 });
 
 /* Create user */
