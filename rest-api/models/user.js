@@ -1,8 +1,8 @@
 var mongoose = require('mongoose');
-var dbConf = require('../db-conf/mongo');
+var dbConf = require('../config/mongo');
 
 mongoose.connect(dbConf.dbUrl, { useNewUrlParser: true })
-    .then((val) => console.log("Connected to db : ", val))
+    .then((val) => console.log("Connected to db : "))
     .catch((val) => console.log("Failed to Connect to db : ", val));
 
 
@@ -34,6 +34,12 @@ const userSchema = mongoose.Schema({
         lowercase : true,
         unique : true,
         validate : [validateEmail, "Valid email is required"]
+    },
+    userType : {
+        type : String,
+        trim : true,
+        enum : ["admin", "guest"],
+        default : "guest"
     },
     regDate : {
         type : Date,
