@@ -5,10 +5,11 @@ var bcrypt = require('bcrypt');
 var jwt = require('jsonwebtoken');
 var fs = require('fs');
 var path = require('path');
+var auth = require('../middlewares/auth');
 var keyPath = path.join(__dirname, '../', '/config/key.json');
 
 /* GET users listing. */
-router.get('/', async function(req, res, next) {
+router.get('/', auth.authenticate, async function(req, res, next) {
   userModel.find({}, function(err, result) {
     if(err) {
       res.status(500).json({message : err});
@@ -21,7 +22,7 @@ router.get('/', async function(req, res, next) {
 });
 
 /* Create user */
-router.post('/create', async function(req, res) {
+router.post('/create',auth.authenticate, async function(req, res) {
   try{
     let userInfo = req.body;
     let salt = await bcrypt.genSalt(10);
@@ -48,7 +49,7 @@ router.post('/create', async function(req, res) {
 
 
 /** updating a user */
-router.put('/update/:username', async function(req, res) {
+router.put('/update/:username',auth.authenticate, async function(req, res) {
   try{
     let salt = await bcrypt.genSalt(10);
     let hashPass = await bcrypt.hash(req.body.password,salt);
@@ -65,7 +66,7 @@ router.put('/update/:username', async function(req, res) {
 });
 
 /** delete user */
-router.delete('/delete/:username', function(req, res) {
+router.delete('/delete/:username',auth.authenticate, function(req, res) {
   userModel.findOneAndRemove({username : req.params.username}, function(err, result) {
     if(err) {
       res.status(500).json({message : err});
@@ -81,9 +82,9 @@ router.post('/login', async function(req, res) {
   try{
     if(req.body.username.length >= 8 && req.body.password.length >= 8){
       let userData = await userModel.findOne({username : req.body.username});
-      if(!userData) res.status(401).json({message : "Invalid credentials"});
+      if(!userData) return res.status(401).json({message : "Invalid credentials"});
       let isPassValid = await bcrypt.compare(req.body.password, userData.password);
-      if(!isPassValid) res.status(401).json({message : "Invalid credentials"});
+      if(!isPassValid) return res.status(401).json({message : "Invalid credentials"});
       fs.readFile(keyPath, (err, data) => {
         let keyFileData = JSON.parse(data);
         let jwtToken = jwt.sign(
