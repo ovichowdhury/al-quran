@@ -50,10 +50,10 @@ router.post('/create',[auth.authenticate, userValidator.create], async function(
 
 
 /** updating a user */
-router.put('/update/:username',auth.authenticate, async function(req, res) {
+router.put('/update/:username',[auth.authenticate, userValidator.update], async function(req, res) {
   try{
     let salt = await bcrypt.genSalt(10);
-    let hashPass = await bcrypt.hash(req.body.password,salt);
+    let hashPass = await bcrypt.hash(req.body.password, salt);
     let result = await userModel.findOneAndUpdate(
       {username : req.params.username},
       {username : req.body.username, password : hashPass, email : req.body.email, userType : req.body.userType}
@@ -67,7 +67,7 @@ router.put('/update/:username',auth.authenticate, async function(req, res) {
 });
 
 /** delete user */
-router.delete('/delete/:username',auth.authenticate, function(req, res) {
+router.delete('/delete/:username',[auth.authenticate, userValidator.delete], function(req, res) {
   userModel.findOneAndRemove({username : req.params.username}, function(err, result) {
     if(err) {
       res.status(500).json({message : err});
@@ -79,24 +79,22 @@ router.delete('/delete/:username',auth.authenticate, function(req, res) {
 });
 
 
-router.post('/login', async function(req, res) {
+router.post('/login',[userValidator.login], async function(req, res) {
   try{
-    if(req.body.username.length >= 8 && req.body.password.length >= 8){
-      let userData = await userModel.findOne({username : req.body.username});
-      if(!userData) return res.status(401).json({message : "Invalid credentials"});
-      let isPassValid = await bcrypt.compare(req.body.password, userData.password);
-      if(!isPassValid) return res.status(401).json({message : "Invalid credentials"});
-      fs.readFile(keyPath, (err, data) => {
-        let keyFileData = JSON.parse(data);
-        let jwtToken = jwt.sign(
-          {_id : userData._id, username : userData.username, userType : userData.userType},
-          keyFileData.jwtPrivateKey
-        );
-        res.header('x-auth-token', jwtToken).status(200).json({message : "Authenticated"});
-      });
-    }
-    else
-      res.status(400).json({message : "Invalid input format"});
+
+    let userData = await userModel.findOne({username : req.body.username});
+    if(!userData) return res.status(401).json({message : "Invalid credentials"});
+    let isPassValid = await bcrypt.compare(req.body.password, userData.password);
+    if(!isPassValid) return res.status(401).json({message : "Invalid credentials"});
+    fs.readFile(keyPath, (err, data) => {
+      let keyFileData = JSON.parse(data);
+      let jwtToken = jwt.sign(
+        {_id : userData._id, username : userData.username, userType : userData.userType},
+        keyFileData.jwtPrivateKey
+      );
+      res.header('x-auth-token', jwtToken).status(200).json({message : "Authenticated"});
+    });
+    
   }
   catch(ex){
     res.status(500).json({message : ex});
