@@ -6,6 +6,7 @@ var jwt = require('jsonwebtoken');
 var fs = require('fs');
 var path = require('path');
 var auth = require('../middlewares/auth');
+var userValidator = require('../middlewares/userValidator');
 var keyPath = path.join(__dirname, '../', '/config/key.json');
 
 /* GET users listing. */
@@ -22,7 +23,7 @@ router.get('/', auth.authenticate, async function(req, res, next) {
 });
 
 /* Create user */
-router.post('/create',auth.authenticate, async function(req, res) {
+router.post('/create',[auth.authenticate, userValidator.create], async function(req, res) {
   try{
     let userInfo = req.body;
     let salt = await bcrypt.genSalt(10);
