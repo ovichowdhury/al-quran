@@ -1,10 +1,4 @@
 var mongoose = require('mongoose');
-var dbConf = require('../config/mongo');
-
-mongoose.connect(dbConf.dbUrl, { useNewUrlParser: true })
-    .then((val) => console.log("Connected to db : "))
-    .catch((val) => console.log("Failed to Connect to db : ", val));
-
 
 var validateEmail = function(email) {
     let regularExp = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
