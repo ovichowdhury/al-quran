@@ -2,59 +2,54 @@ var mongoose = require('mongoose');
 
 
 mongoose.connect('mongodb://localhost/TestDB', { useNewUrlParser: true })
-.then(
-() => {
-
-const childSchema = mongoose.Schema({
-    name : String,
-    age : Number
-});
-
-const parentSchema = mongoose.Schema({
-    name : String,
-    child : [childSchema]
-});
-
-var Parent = mongoose.model('Parent', parentSchema);
-
-/*var newParent = new Parent({
-    name: "Hadith",
-    child: [{
-        name: "Verse",
-        age : 1400
-    }]
-});
-
-newParent.save((err, res) => {
-    if(err) console.log(err);
-    else console.log(res);
-})*/
-
-/*async function run(){
-    var quran = await Parent.findOne({'name' : 'Quran'});
-    console.log(quran.child);
-    
-    console.log("End............", d);
-}
-
-
-run();*/
-
-
-
-/*Parent.findOne({'name' : 'Quran'}, (err, quran) => {
-    console.log(quran.child);
-    mongoose.connection.close();
-});*/
-
-async function run(){
-    Parent.findOne({'name' : 'Quran'}).where('child.age').equals(1400).select('child').exec((err, res) => {
-        console.log(res);
-        mongoose.connection.close();
+.then(async function() {
+    const childSchema = mongoose.Schema({
+        name : String,
+        age : Number
     });
     
-}
+    const parentSchema = mongoose.Schema({
+        name : String,
+        child : [childSchema]
+    });
+    
+    var Parent = mongoose.model('Parent', parentSchema);
 
-run();
+    let result = await Parent.aggregate([
+        {
+            $match : {'name' : 'Quran'}
+        },
+        {
+            $addFields : {
+                "ayats" : {
+                    $filter : {
+                        input : "$child",
+                        as : "ayat",
+                        cond : {$eq: ["$$ayat.age", 1500]}
+                    }
+                }
+            }
+        },
+        {
+            $project : {
+                _id : 0,
+                ayats : 1
+            }
+        }
+    ]);
 
+    console.log(result[0].ayats[0]);
+    mongoose.connection.close();
 });
+
+/*
+db.getCollection('posts').aggregate(
+    {$match: {"author.id": authorId}},
+	{$addFields : {"comments":{$filter:{ // We override the existing field!
+		input: "$comments",
+		as: "comment",
+		cond: {$eq: ["$$comment.state.deleted", false]}
+	}}}}
+);
+ */
+
