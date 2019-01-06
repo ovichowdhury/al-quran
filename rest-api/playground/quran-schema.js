@@ -2,14 +2,14 @@ var mongoose = require('mongoose');
 
 
 var ayat = {
-    idNum: 2,
-    ayatNo: 2,
+    idNum: 3,
+    ayatNo: 3,
     SurahName: 'fatiha',
     Para: '1',
     hash: 'abcde',
-    arabic: 'this is second ayat in fatiha',
-    english: 'this is second ayat in fatiha',
-    bangla: 'this is second ayat in fatiha'
+    arabic: 'this is th ayat in fatiha',
+    english: 'this is th ayat in fatiha',
+    bangla: 'this is th ayat in fatiha'
 };
 
 mongoose.connect('mongodb://localhost/TestDB', { useNewUrlParser: true })
@@ -80,7 +80,7 @@ mongoose.connect('mongodb://localhost/TestDB', { useNewUrlParser: true })
                             input : "$contents",
                             as : "ayat",
                             cond : {$and : [
-                                {$eq: ["$$ayat.SurahName", 'fatiha']},
+                                {$eq: ["$$ayat.SurahName", {$toLower : 'FaTiha'} ]},
                                 {$eq: ["$$ayat.ayatNo", 2]}
                             ]}
                             //cond : {$eq: ["$$ayat.idNum", 2]}
@@ -100,9 +100,8 @@ mongoose.connect('mongodb://localhost/TestDB', { useNewUrlParser: true })
         console.log(result[0].ayats[0]);
     }
 
-    //insertSubDoc();
-    await searchBySurahNameAndAyatNum();
-
+    await insertSubDoc();
+    //await searchBySurahNameAndAyatNum();
 
     mongoose.connection.close();
 });
