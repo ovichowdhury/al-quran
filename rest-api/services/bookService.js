@@ -38,19 +38,6 @@ function updateBook(id, key, value) {
 
 function searchByTitle(title){
     return bookModel.findOne({title:title});
-//     return  bookModel.aggregate([
-    
-//     {
-//         $match : {title:title}
-//     },
-//     {
-//         $project : {
-//             type:0,
-//             author:0,
-//             contents : 0
-//         }
-//     }
-// ]);
     
 }
 
