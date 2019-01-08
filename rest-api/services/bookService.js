@@ -22,8 +22,42 @@ function updateBook(id, key, value) {
     return bookModel.findOneAndUpdate({_id: mongoose.Types.ObjectId(id)}, {[key]: value});
 }
 
+ function getAllBook(){
+    return  bookModel.aggregate([
+        {
+            $match : {}
+        },
+        {
+            $project : {
+                contents : 0
+            }
+        }
+    ]);
+
+}
+
+function searchByTitle(title){
+    return bookModel.findOne({title:title});
+//     return  bookModel.aggregate([
+    
+//     {
+//         $match : {title:title}
+//     },
+//     {
+//         $project : {
+//             type:0,
+//             author:0,
+//             contents : 0
+//         }
+//     }
+// ]);
+    
+}
+
 module.exports = {
     createBook : createBook,
     removeBook : removeBook,
-    updateBook : updateBook
+    updateBook : updateBook,
+    getAllBook : getAllBook,
+    searchByTitle: searchByTitle
 }
