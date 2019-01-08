@@ -2,7 +2,7 @@ const bookModel = require('../models/book');
 const genesis = require('../config/genesis');
 const mongoose = require('mongoose');
 
-function createBook(title, type, author){
+function createBook(title, type, author) {
     let genesisBlock = genesis.genesisBlock;
     let newBook = new bookModel({
         title: title,
@@ -14,37 +14,47 @@ function createBook(title, type, author){
 }
 
 function removeBook(title) {
-    return bookModel.findOneAndDelete({title : title});
+    return bookModel.findOneAndDelete({ title: title });
 }
 
 
 function updateBook(id, key, value) {
-    return bookModel.findOneAndUpdate({_id: mongoose.Types.ObjectId(id)}, {[key]: value});
+    return bookModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(id) }, { [key]: value });
 }
 
- function getAllBook(){
-    return  bookModel.aggregate([
+function getAllBook() {
+    return bookModel.aggregate([
         {
-            $match : {}
+            $match: {}
         },
         {
-            $project : {
-                contents : 0
+            $project: {
+                contents: 0
             }
         }
     ]);
 
 }
 
-function searchByTitle(title){
-    return bookModel.findOne({title:title});
-    
+function searchByTitle(title) {
+    // return bookModel.findOne({title:title});
+    return bookModel.aggregate([
+         {
+           $match: {title: title}
+         },
+
+         {
+             $project: {
+                 contents : 0
+             }
+         }
+    ]);
 }
 
 module.exports = {
-    createBook : createBook,
-    removeBook : removeBook,
-    updateBook : updateBook,
-    getAllBook : getAllBook,
+    createBook: createBook,
+    removeBook: removeBook,
+    updateBook: updateBook,
+    getAllBook: getAllBook,
     searchByTitle: searchByTitle
 }
