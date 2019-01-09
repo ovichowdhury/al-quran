@@ -37,7 +37,6 @@ function getAllBook() {
 }
 
 function searchByTitle(title) {
-    // return bookModel.findOne({title:title});
     return bookModel.aggregate([
          {
            $match: {title: title}
@@ -51,8 +50,20 @@ function searchByTitle(title) {
     ]);
 }
 
-function getLastSubDoc() {
-    
+async function getLastSubDoc(bookTitle) {
+    let result = await bookModel.aggregate([
+        {
+            $match : {title: bookTitle}
+        },
+        {
+            $project : {
+                _id: 0,
+                last : {$arrayElemAt: ["$contents", -1]}
+            }
+        }
+    ]);
+
+    return result[0].last;
 }
 
 module.exports = {
@@ -60,5 +71,6 @@ module.exports = {
     removeBook: removeBook,
     updateBook: updateBook,
     getAllBook: getAllBook,
-    searchByTitle: searchByTitle
+    searchByTitle: searchByTitle,
+    getLastSubDoc: getLastSubDoc
 }
