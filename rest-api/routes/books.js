@@ -60,5 +60,8 @@ router.put('/update/:id', [auth.authenticate], async function (req, res, next) {
     }
 });
 
+// for adding a sub document in book (mining)
+
+
 
 module.exports = router;

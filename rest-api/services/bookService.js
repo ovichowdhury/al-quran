@@ -19,7 +19,7 @@ function removeBook(title) {
 
 
 function updateBook(id, key, value) {
-    return bookModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(id) }, { [key]: value });
+    return bookModel.findOneAndUpdate({ _id: mongoose.Types.ObjectId(id) }, { [key]: value }).select('_id title type author');
 }
 
 function getAllBook() {
@@ -49,6 +49,10 @@ function searchByTitle(title) {
              }
          }
     ]);
+}
+
+function getLastSubDoc() {
+    
 }
 
 module.exports = {
