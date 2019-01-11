@@ -60,5 +60,31 @@ router.put('/update/:id', [auth.authenticate], async function (req, res, next) {
     }
 });
 
+/**
+ * Quran specific routes
+ */
+
+ // mining a block for quran
+ router.put('/mineblock-quran/:title', [auth.authenticate], async function(req, res, next) {
+    try {
+        let result = await bookService.mineQuranBlock(req.params.title, {
+            surahName: req.body.surahName,
+            ayatNum: req.body.ayatNum,
+            paraNum: req.body.paraNum,
+            rukuNum: req.body.rukuNum,
+            arabic: req.body.arabic,
+            english: req.body.english,
+            bangla: req.body.bangla,
+            otherInfo: req.body.otherInfo
+        });
+        console.log("in mine handler");
+        console.log(result);
+        res.status(200).json(result);
+    }
+    catch(ex) {
+        res.status(500).json({ message: ex });
+    }
+ });
+
 
 module.exports = router;

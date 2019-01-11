@@ -1,6 +1,7 @@
 const bookModel = require('../models/book');
 const genesis = require('../config/genesis');
 const mongoose = require('mongoose');
+const childProcess = require('child_process');
 
 function createBook(title, type, author) {
     let genesisBlock = genesis.genesisBlock;
@@ -66,11 +67,54 @@ async function getLastSubDoc(bookTitle) {
     return result[0].last;
 }
 
+
+function getUnixTime() {
+    return Math.round(new Date().getTime() / 1000);
+}
+
+async function mineQuranBlock(title, ayatInfo) {
+    console.log("In sevice");
+    let lastBlock = await getLastSubDoc(title);
+    console.log(lastBlock);
+    let quranBlock = {
+        index : lastBlock.index + 1,
+        nonce : 0,
+        timestamp : getUnixTime(),
+        previousHas : lastBlock.hash,
+        hash : "",
+        surahName : ayatInfo.surahName,
+        ayatNum : ayatInfo.ayatNum,
+        paraNum : ayatInfo.paraNum,
+        rukuNum : ayatInfo.rukuNum,
+        arabic : ayatInfo.arabic,
+        english : ayatInfo.english,
+        bangla : ayatInfo.bangla,
+        otherInfo : ayatInfo.otherInfo
+    }
+    console.log(JSON.stringify(quranBlock));
+    const child = childProcess.fork(__dirname + '/miner.js', [JSON.stringify(quranBlock)]);
+
+    child.on('message', async (block) => {
+        console.log("Got the block from miner");
+        console.log(block);
+        let query = {title: title};
+        let cond = {
+            $push : {
+                contents : block
+            }
+        }
+
+        await bookModel.updateOne(query, cond)
+        return block;
+    });
+}
+
 module.exports = {
     createBook: createBook,
     removeBook: removeBook,
     updateBook: updateBook,
     getAllBook: getAllBook,
     searchByTitle: searchByTitle,
-    getLastSubDoc: getLastSubDoc
+    getLastSubDoc: getLastSubDoc,
+    mineQuranBlock: mineQuranBlock
 }
