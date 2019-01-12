@@ -4,7 +4,7 @@ const auth = require('../middlewares/auth');
 const bookService = require('../services/bookService');
 
 // list of all books
-router.get('/getall', [auth.authenticate], async function (req, res, next) {
+router.get('/get-all', [auth.authenticate], async function (req, res, next) {
     try {
         let result = await bookService.getAllBook();
         res.status(200).json(result);
@@ -16,7 +16,7 @@ router.get('/getall', [auth.authenticate], async function (req, res, next) {
 });
 
  // find one book
- router.get('/searchbook/:title', [auth.authenticate], async function(req,res,next){
+ router.get('/search-book/:title', [auth.authenticate], async function(req,res,next){
     try{
         let result = await bookService.searchByTitle(req.params.title);
         res.status(200).json(result);  
@@ -60,14 +60,25 @@ router.put('/update/:id', [auth.authenticate], async function (req, res, next) {
     }
 });
 
+// for removing last block from sub document
+router.put('/remove-last-block/:title', [auth.authenticate], async function(req, res, next) {
+    try {
+        let result = await bookService.removeLastBlock(req.params.title);
+        res.status(200).json(result);
+    }
+    catch(ex) {
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
+
 /**
  * Quran specific routes
  */
 
  // mining a block for quran
- router.put('/mineblock-quran/:title', [auth.authenticate], async function(req, res, next) {
+ router.put('/mine-block-quran/:title', [auth.authenticate], async function(req, res, next) {
     try {
-        let result = await bookService.mineQuranBlock(req.params.title, {
+        await bookService.mineQuranBlock(req.params.title, {
             surahName: req.body.surahName,
             ayatNum: req.body.ayatNum,
             paraNum: req.body.paraNum,
@@ -76,15 +87,14 @@ router.put('/update/:id', [auth.authenticate], async function (req, res, next) {
             english: req.body.english,
             bangla: req.body.bangla,
             otherInfo: req.body.otherInfo
-        });
-        console.log("in mine handler");
-        console.log(result);
-        res.status(200).json(result);
+        }, res);
     }
     catch(ex) {
         res.status(500).json({ message: ex });
     }
  });
+
+
 
 
 module.exports = router;

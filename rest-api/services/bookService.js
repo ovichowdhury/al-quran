@@ -3,6 +3,18 @@ const genesis = require('../config/genesis');
 const mongoose = require('mongoose');
 const childProcess = require('child_process');
 
+/**
+ * utility functions
+ */
+
+function getUnixTime() {
+    return Math.round(new Date().getTime() / 1000);
+}
+
+/*
+    Generic service methods 
+*/
+
 function createBook(title, type, author) {
     let genesisBlock = genesis.genesisBlock;
     let newBook = new bookModel({
@@ -67,12 +79,19 @@ async function getLastSubDoc(bookTitle) {
     return result[0].last;
 }
 
-
-function getUnixTime() {
-    return Math.round(new Date().getTime() / 1000);
+// for removing last block from content array
+function removeLastBlock(title) {
+    return bookModel.updateOne({title: title}, {$pop : {contents: 1}});
 }
 
-async function mineQuranBlock(title, ayatInfo) {
+
+/**
+ * Quran specific services
+ */
+
+
+
+async function mineQuranBlock(title, ayatInfo, response) {
     console.log("In sevice");
     let lastBlock = await getLastSubDoc(title);
     console.log(lastBlock);
@@ -105,7 +124,7 @@ async function mineQuranBlock(title, ayatInfo) {
         }
 
         await bookModel.updateOne(query, cond)
-        return block;
+        response.status(200).json(block);
     });
 }
 
@@ -116,5 +135,6 @@ module.exports = {
     getAllBook: getAllBook,
     searchByTitle: searchByTitle,
     getLastSubDoc: getLastSubDoc,
-    mineQuranBlock: mineQuranBlock
+    mineQuranBlock: mineQuranBlock,
+    removeLastBlock: removeLastBlock
 }
