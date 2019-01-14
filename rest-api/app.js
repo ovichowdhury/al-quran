@@ -9,6 +9,7 @@ var mongoDB = require('./config/mongo');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var bookRouter = require('./routes/books');
+var quranSearchRouter = require('./routes/searchQuran');
 
 var app = express();
 
@@ -25,6 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/books', bookRouter);
+app.use('/search-quran', quranSearchRouter);
 
 
 
