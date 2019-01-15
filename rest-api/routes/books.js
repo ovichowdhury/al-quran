@@ -94,7 +94,14 @@ router.put('/remove-last-block/:title', [auth.authenticate], async function(req,
     }
  });
 
-
+router.get('/quran-validity-check', [auth.authenticate], async function(req, res, next){
+    try {
+        await bookService.quranValidityCheck(res);
+    }
+    catch(ex) {
+        res.status(500).json({ message: ex });
+    }
+});
 
 
 module.exports = router;

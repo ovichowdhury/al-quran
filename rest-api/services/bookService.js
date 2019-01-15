@@ -128,6 +128,13 @@ async function mineQuranBlock(title, ayatInfo, response) {
     });
 }
 
+async function quranValidityCheck(response) {
+    childProcess.execFile('node', [`${__dirname}/quranValChecker.js`], (err, stdout, stderr) => {
+        if(err) throw err;
+        response.status(200).send(stdout);
+    });
+}
+
 module.exports = {
     createBook: createBook,
     removeBook: removeBook,
@@ -136,5 +143,6 @@ module.exports = {
     searchByTitle: searchByTitle,
     getLastSubDoc: getLastSubDoc,
     mineQuranBlock: mineQuranBlock,
-    removeLastBlock: removeLastBlock
+    removeLastBlock: removeLastBlock,
+    quranValidityCheck: quranValidityCheck
 }
