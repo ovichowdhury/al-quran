@@ -99,7 +99,7 @@ async function mineQuranBlock(title, ayatInfo, response) {
         index : lastBlock.index + 1,
         nonce : 0,
         timestamp : getUnixTime(),
-        previousHas : lastBlock.hash,
+        previousHash : lastBlock.hash,
         hash : "",
         surahName : ayatInfo.surahName,
         ayatNum : ayatInfo.ayatNum,
