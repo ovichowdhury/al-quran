@@ -39,7 +39,7 @@ async function gettingAccountBalance() {
 
 async function invokeSmartContract() {
 
-    let ayatHash = await QuranContract.methods.getAyat(2).call();
+    let ayatHash = await QuranContract.methods.getAyat(4).call();
     console.log(ayatHash);
 }
 
@@ -58,7 +58,7 @@ async function sendTx() {
         "gasLimit": web3.utils.toHex(210000),
         "to": contractAddress,
         "value": "0x0",
-        "data": QuranContract.methods.addAyat(2, "this-is-2-hash").encodeABI(),
+        "data": QuranContract.methods.addAyat(4, "this-is-4-hash").encodeABI(),
         "nonce": web3.utils.toHex(nonce)
     };
 
@@ -66,10 +66,9 @@ async function sendTx() {
 
     transaction.sign(privateKey);
 
-    web3.eth.sendSignedTransaction('0x'+transaction.serialize().toString('hex'))
-        .on('transactionHash',console.log);
+    let txHash = await web3.eth.sendSignedTransaction('0x'+transaction.serialize().toString('hex'));
 
-
+    console.log(txHash);
 }
 
 async function sendTxForDelete() {
@@ -97,6 +96,8 @@ async function sendTxForDelete() {
 }
 
 //sendTx();
+
+//console.log("**********This is ENd***********");
 
 invokeSmartContract();
 

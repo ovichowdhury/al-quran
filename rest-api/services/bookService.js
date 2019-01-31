@@ -2,6 +2,7 @@ const bookModel = require('../models/book');
 const genesis = require('../config/genesis');
 const mongoose = require('mongoose');
 const childProcess = require('child_process');
+const ethService = require('./ethService');
 
 /**
  * utility functions
@@ -122,9 +123,15 @@ async function mineQuranBlock(title, ayatInfo, response) {
                 contents : block
             }
         }
-
-        await bookModel.updateOne(query, cond)
-        response.status(200).json(block);
+        let ethTx = await ethService.addAyatHash(block.index, block.hash);
+        if(ethTx.transactionHash){
+            await bookModel.updateOne(query, cond)
+            response.status(200).json({block: block, ethTx: ethTx});
+        }
+        else{
+            response.status(500).json({message : "Ethereum transaction error. block can not be added"});
+        }
+        
     });
 }
 
