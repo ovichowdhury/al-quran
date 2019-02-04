@@ -135,8 +135,9 @@ async function mineQuranBlock(title, ayatInfo, response) {
     });
 }
 
-async function quranValidityCheck(response) {
-    childProcess.execFile('node', [`${__dirname}/quranValChecker.js`], (err, stdout, stderr) => {
+async function quranValidityCheck(response, title) {
+    console.log("In quran validity check service");
+    childProcess.execFile('node', [`${__dirname}/quranValChecker.js`, title], (err, stdout, stderr) => {
         if(err) throw err;
         response.status(200).send(stdout);
     });

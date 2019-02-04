@@ -39,7 +39,7 @@ async function gettingAccountBalance() {
 
 async function invokeSmartContract() {
 
-    let ayatHash = await QuranContract.methods.getAyat(4).call();
+    let ayatHash = await QuranContract.methods.getAyat(1).call();
     console.log(ayatHash);
 }
 

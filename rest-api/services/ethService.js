@@ -47,7 +47,8 @@ async function deleteAyatHash(index) {
 }
 
 async function getAyatHash(index) {
-
+    let ayatHash = await QuranContract.methods.getAyat(index).call();
+    return ayatHash;
 }
 
 module.exports = {
