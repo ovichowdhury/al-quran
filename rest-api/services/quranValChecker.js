@@ -13,6 +13,7 @@ mongoose.connect(dbURI, { useNewUrlParser: true});
 mongoose.connection.on('connected', function () {
     //console.log("Successfully connected to mongo");
     mongoose.connection.db.collection('books', async function(err, books) {
+        let response = {};
         if(err) console.error("error connecting to db");
         let quran = await books.findOne({title: process.argv[2]});
         //console.log(quran);
@@ -30,28 +31,28 @@ mongoose.connection.on('connected', function () {
             cHash = crypto.createHash('sha256').update(JSON.stringify(ayat)).digest('hex');
             ethHash = await ethService.getAyatHash(i);
             if(cHash == blockHash && ayat.previousHash == previousBlockHash && cHash == ethHash) {
-                /*console.log("Current Hash : ", cHash);
-                console.log("Block Hash : ", blockHash);
-                console.log("ETH Hash : ", ethHash);*/
                 previousBlockHash = cHash;
                 continue;
             }
             else {
-                console.log(JSON.stringify(ayat));
-                console.log("Current Hash : ", cHash);
-                console.log("Block Hash : ", blockHash);
-                console.log("ETH Hash : ", ethHash);
-                console.log("Previous Hash : ", ayat.previousHash);
-                console.log("Previous Block Hash : ", previousBlockHash);
+                response.currentHash = cHash;
+                response.hash = blockHash;
+                response.ethHash = ethHash;
+                response.previousHash = ayat.previousHash;
+                response.previousBlockHash = previousBlockHash;
                 validity = false;
                 break;
             }
         }
         
-        if(validity)
-            console.log("Blockchain is Valid");
-        else
-            console.log("Blockchain is Invalid");
+        if(validity){
+            response.message = "Blockchain is Valid";
+            console.log(JSON.stringify(response));
+        }
+        else{
+            response.message = "Blockchain is Invalid";
+            console.log(JSON.stringify(response));
+        }
 
         mongoose.disconnect();
     });

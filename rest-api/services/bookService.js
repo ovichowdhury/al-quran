@@ -139,7 +139,7 @@ async function quranValidityCheck(response, title) {
     console.log("In quran validity check service");
     childProcess.execFile('node', [`${__dirname}/quranValChecker.js`, title], (err, stdout, stderr) => {
         if(err) throw err;
-        response.status(200).send(stdout);
+        response.status(200).json(JSON.parse(stdout));
     });
 }
 
