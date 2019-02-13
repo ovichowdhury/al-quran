@@ -14,7 +14,7 @@ var http = require('http');
  * */
 
 process.on('uncaughtException', (err) => {
-    console.log(err.message);
+    console.log("Uncaught Exception : ", err.message);
 });
 
 /**
